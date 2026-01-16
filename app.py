@@ -4,75 +4,73 @@ import time
 # إعدادات الصفحة
 st.set_page_config(page_title="Safe Space | Dr. Sharon", page_icon="🌿", layout="centered")
 
-# التصميم الكحلي الفخم مع لمسات احترافية
+# التصميم الفخم
 st.markdown("""
     <style>
-    .stApp { background-color: #0f172a; color: white; }
-    .main-title { font-size: 35px; color: #38bdf8; text-align: center; font-weight: bold; margin-bottom: 20px; }
-    .chat-container { background-color: #1e293b; padding: 15px; border-radius: 15px; margin-bottom: 10px; border-right: 4px solid #38bdf8; }
-    .user-msg { color: #f8fafc; font-weight: bold; margin-bottom: 5px; }
-    .dr-msg { color: #38bdf8; margin-bottom: 15px; font-style: italic; }
-    .stButton>button { border-radius: 20px; font-weight: bold; width: 100%; transition: 0.3s; }
-    .whatsapp-btn { background: linear-gradient(90deg, #25d366, #128c7e) !important; color: white !important; height: 50px; font-size: 18px !important; }
+    .stApp { background-color: #0b1120; color: white; }
+    .main-title { font-size: 35px; color: #38bdf8; text-align: center; font-weight: bold; }
+    .chat-bubble { background-color: #1e293b; padding: 20px; border-radius: 15px; border-right: 5px solid #38bdf8; margin-top: 15px; font-size: 18px; line-height: 1.7; }
+    .whatsapp-btn { background: linear-gradient(90deg, #25d366, #128c7e) !important; color: white !important; border-radius: 15px; padding: 12px; text-decoration: none; display: block; text-align: center; font-weight: bold; font-size: 18px; }
     </style>
     """, unsafe_allow_html=True)
 
-# تفعيل الذاكرة (عشان الشات ما يتمسحش)
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 st.markdown('<div class="main-title">🌿 Safe Space | Dr. Sharon</div>', unsafe_allow_html=True)
 
-# عرض الشات القديم والجديد
-chat_placeholder = st.container()
-with chat_placeholder:
-    for msg in st.session_state.messages:
-        role = "أنت" if msg["role"] == "user" else "د. شارون"
-        style = "user-msg" if msg["role"] == "user" else "dr-msg"
-        st.markdown(f'<div class="chat-container"><div class="{style}">{role}: {msg["content"]}</div></div>', unsafe_allow_html=True)
+# عرض شات متصل (الذاكرة)
+for msg in st.session_state.messages:
+    role = "أنت" if msg["role"] == "user" else "د. شارون"
+    st.markdown(f'<div class="chat-bubble"><b>{role}:</b> {msg["content"]}</div>', unsafe_allow_html=True)
+
+# عقل دكتور شارون (الردود الذكية بالمصري والدين)
+def get_intelligent_response(text):
+    text = text.lower()
+    
+    # 1. منع الانتحار بوازع ديني ونفسي
+    if any(word in text for word in ["انتحر", "اموت", "انهي حياتي", "اقتل نفسي"]):
+        return """يا صديقي، استغفر الله العظيم.. الدنيا مهما اسودت فهي دار اختبار، وروحك دي أمانة عندك مش ملكك عشان تنهيها. ربنا بيقول "وَلَا تَقْتُلُوا أَنفُسَكُمْ ۚ إِنَّ اللَّهَ كَانَ بِكُمْ رَحِيمًا". 
+        الوجع اللي حاسس بيه دلوقتي صدقني هيعدي، وكل ضيقة وليها مخرج. بلاش تضيع آخرتك ودنيتك في لحظة يأس. أنا جنبك وسامعك، احكي لي إيه اللي وصلك لكدة؟ خلينا نلاقي حل سوا، والموت عمره ما كان حل. كلمني واتساب حالاً لو حاسس إنك مش قادر! ❤️🙏"""
+
+    # 2. مشاكل الأهل (الاحتواء والبر)
+    elif "أهل" in text or "اهل" in text or "بابا" in text or "ماما" in text:
+        return """الأهل هما أصعب وأهم علاقة.. مفيش حد بيحبك قدهم حتى لو طريقتهم غلط أو خنقتك. النبي وصانا بالبر حتى لو في اختلاف. 
+        بس أنا عايز أعرف منك: إيه أكتر موقف النهاردة خلاك تحس إنك مش طايقهم؟ احكي لي بالتفصيل هما عملوا إيه؟ أنا سامعك ومش هحكم عليك، هنفهم سوا إزاي نتعامل معاهم من غير ما نتعب نفسياً. 🏠🫂"""
+
+    # 3. الفشل واليأس
+    elif any(word in text for word in ["فشلت", "خسرت", "ضعت"]):
+        return "الوقوع مش عيب، العيب إننا مانقومش. ربنا بيقفل باب عشان يفتح عشرة أحسن منه. قولي بس إيه اللي حصل وخلاك تحس بالفشل ده؟ خلينا نحلل الموقف ونطلع منه بدرس يقويك. أنت قدها! ✨💪"
+
+    # رد عام ذكي (بيحلل سياق الكلام)
+    elif len(text) > 15:
+        return "كلامك عميق ومحتاج وقفة.. أنا حاسس بكل حرف كتبته. كمل فضفضة وقولي إيه أكتر تفصيلة واجعاك في الحكاية دي؟ أنا مركز معاك جداً يا بطل. 😊🌿"
+    
+    else:
+        return "أنا معاك وسامعك بكل اهتمام.. فضفض وطلع اللي في قلبك كله، أنا دكتورك وصديقك. ❤️"
 
 # منطقة الإدخال
-with st.form("chat_form", clear_on_submit=True):
-    user_input = st.text_input("احكي اللي جواك هنا...", placeholder="أنا سامعك..")
+with st.form("chat_input", clear_on_submit=True):
+    u_input = st.text_input("احكي اللي جواك (دكتور شارون سامعك)...")
     submit = st.form_submit_button("إرسال")
 
-# منطق الردود الاحترافي
-def get_dr_response(text):
-    text = text.lower()
-    if "اهل" in text or "بيت" in text:
-        return "الأهل هما السند بس ساعات بيبقوا هما الحمل.. احكي لي بالظبط إيه اللي بيحصل في البيت ومخليك مش طايق الوضع؟ أنا معاك."
-    elif "حادث" in text or "خبط" in text:
-        return "ألف سلامة عليك! دي خضة وحشة أوي.. ارتاح دلوقتي وطمن جسمك إنك بقيت في أمان. احكي لي حسيت بإيه وقتها؟"
-    elif "فشل" in text or "خسر" in text:
-        return "مفيش حد بيوصل للقمة من غير ما يقع في حفر كتير. أنت بطل إنك لسه واقف وبتحكي. إيه اللي ناوي تعمله المرة الجاية؟"
-    else:
-        return "كلامك لمس قلبي.. أنا حاسس بكل كلمة. كمل يا صديقي، الفضفضة هي أول طريق الشفاء. أنا مركز معاك."
-
-if submit and user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    response = get_dr_response(user_input)
-    st.session_state.messages.append({"role": "dr", "content": response})
+if submit and u_input:
+    st.session_state.messages.append({"role": "user", "content": u_input})
+    with st.spinner("دكتور شارون بيفكر في أنسب رد ليك..."):
+        time.sleep(1.5)
+        ans = get_intelligent_response(u_input)
+        st.session_state.messages.append({"role": "dr", "content": ans})
     st.rerun()
 
-# الأزرار التفاعلية (المحفزات)
+# الأزرار والدعم
 st.markdown("---")
-st.write("### محتاج مساعدة سريعة؟")
-col1, col2, col3 = st.columns(3)
-
+col1, col2 = st.columns(2)
 with col1:
-    if st.button("✨ شجعني"):
-        st.info("أنت قوي جداً لمجرد إنك واجهت مشاعرك النهاردة وجيت هنا. كمل يا بطل!")
+    if st.button("✨ رسالة تحفيز"):
+        st.info("أنت النهاردة أقوى من امبارح لمجرد إنك قررت تتكلم. كمل طريقك!")
 with col2:
-    if st.button("💡 نصيحة"):
-        st.success("جرب تاخد نفس عميق (شهيق 4 ثواني، كتم 4، زفير 4).. جربها دلوقتي وهتحس بفرق.")
-with col3:
-    if st.button("🗑️ مسح الشات"):
+    if st.button("🗑️ ابدأ جلسة جديدة"):
         st.session_state.messages = []
         st.rerun()
 
-# زرار الواتساب (القنبلة)
-st.markdown("<br>", unsafe_allow_html=True)
-whatsapp_link = "https://wa.me/201009469831"
-st.markdown(f'<a href="{whatsapp_link}" target="_blank"><button class="stButton whatsapp-btn" style="width:100%; cursor:pointer;">📞 تواصل مع د. شارون شخصياً (واتساب)</button></a>', unsafe_allow_html=True)
-
-st.markdown("<br><p style='text-align: center; opacity: 0.5;'>Safe Space | د. شارون - خصوصية تامة</p>", unsafe_allow_html=True)
+st.markdown(f'<a href="https://wa.me/201009469831" target="_blank" class="whatsapp-btn">📞 ابعت رسالة خاصة لدكتور شارون (واتساب)</a>', unsafe_allow_html=True)
