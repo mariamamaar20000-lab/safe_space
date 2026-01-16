@@ -1,72 +1,69 @@
 import streamlit as st
 import time
 
-# إعدادات واجهة العيادة
-st.set_page_config(page_title="Safe Space | Dr. Sharon", page_icon="🌿", layout="wide")
+# إعدادات الصفحة
+st.set_page_config(page_title="Safe Space AI | Dr. Sharon", page_icon="🧠", layout="centered")
 
-# تصميم الألوان والخطوط (CSS)
+# التصميم الكحلي الفخم (CSS)
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(to right, #e0eafc, #cfdef3);
+        background-color: #1a2634; /* لون كحلي غامق */
+        color: white;
     }
-    .main-title {
-        font-size: 50px;
-        color: #2C3E50;
-        text-align: center;
-        font-family: 'Arial';
-        padding: 20px;
+    .stTextInput input, .stTextArea textarea {
+        background-color: #2c3e50 !important;
+        color: white !important;
+        border: 1px solid #3498db !important;
     }
-    .quote-box {
-        background-color: white;
-        padding: 20px;
+    h1, h2, h3, p {
+        color: white !important;
+    }
+    .stButton>button {
+        background-color: #3498db;
+        color: white;
+        border-radius: 20px;
+        width: 100%;
+        border: none;
+    }
+    .bot-msg {
+        background-color: #2c3e50;
+        padding: 15px;
         border-radius: 15px;
-        border-right: 5px solid #2980b9;
-        margin-bottom: 25px;
+        border-right: 5px solid #3498db;
+        margin-top: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# العنوان الرئيسي
-st.markdown('<h1 class="main-title">🌿 Safe Space | Dr. Sharon</h1>', unsafe_allow_html=True)
+st.title("🧠 عيادة الذكاء الاصطناعي | د. شارون")
+st.write("مرحباً بك في مساحتك الخاصة. أنا هنا لأسمعك وأحلل مشكلاتك بكل سرية.")
 
-# مقولة ملهمة تتغير (التشويق)
-st.markdown("""
-<div class="quote-box">
-    <i>"كل رحلة تعافي تبدأ بكلمة.. وهذه هي مساحتك الخاصة جداً."</i>
-</div>
-""", unsafe_allow_html=True)
+# منطقة الدردشة
+user_problem = st.text_area("صف لي ما تشعر به أو المشكلة التي تواجهك:")
 
-# تقسيم الصفحة لأعمدة
-col1, col2 = st.columns([2, 1])
+if st.button("تحليل المشكلة والحصول على حل"):
+    if user_problem:
+        with st.spinner('جاري تحليل كلماتك بعمق...'):
+            time.sleep(2) # محاكاة تفكير الذكاء الاصطناعي
+            
+            st.subheader("💡 تحليل العيادة الذكية:")
+            
+            # منطق رد تفاعلي (Simulated AI Logic)
+            if "حزين" in user_problem or "ضيق" in user_problem:
+                response = "أشعر بحزنك يا صديقي. تذكر أن الغيوم لا تبقى للأبد، والتنفس بعمق الآن هو أول خطوة للهدوء. هل جربت كتابة ما يزعجك في ورقة وحرقها؟"
+            elif "قلق" in user_problem or "خايف" in user_problem:
+                response = "القلق هو مجرد إنذار خاطئ من العقل. أنت في أمان الآن. حاول تركيز نظرك على 3 أشياء زرقاء حولك الآن لتهدئة جهازك العصبي."
+            elif "تعبان" in user_problem or "مرهق" in user_problem:
+                response = "جسدك يطلب منك الهدنة. أنت لست في سباق مع أحد. خذ قسطاً من الراحة، فالعالم لن يتوقف إذا ارتحت قليلاً."
+            else:
+                response = "شكرًا لثقتك ومشاركتي هذه المشاعر. أنت شخص شجاع جداً لمجرد حديثك عن هذا. ابدأ بالتركيز على ما يمكنك التحكم فيه فقط اليوم."
+            
+            st.markdown(f'<div class="bot-msg">{response}</div>', unsafe_allow_html=True)
+            st.balloons()
+    else:
+        st.warning("من فضلك اكتب شيئاً أولاً لأتمكن من مساعدتك.")
 
-with col1:
-    st.subheader("كيف تشعر اللحظة؟")
-    mood = st.select_slider(
-        "حرك المؤشر لتعبر عن حالتك النفسية:",
-        options=["محطم 💔", "قلق 😟", "محايد 😐", "هادئ 😌", "سعيد جداً ✨"]
-    )
-    
-    note = st.text_area("ما الذي يدور في ذهنك الآن؟ (تفريغ مشاعر)")
-    
-    if st.button("إرسال إلى ملفك السري"):
-        with st.spinner('يتم تحليل مشاعرك بعناية...'):
-            time.sleep(2) # حركة تشويقية
-            st.success(f"تم تسجيل حالتك كـ ({mood}). أنا هنا بجانبك يا دكتور.")
-            st.balloons() # احتفال بسيط بالخطوة
-
-with col2:
-    st.info("💡 نصيحة اليوم:")
-    st.write("التنفس العميق لـ 3 دقائق يقلل من هرمون التوتر فوراً. جربها الآن!")
-    
-    # عداد تشويقي لجلسة استرخاء
-    if st.button("ابدأ تمرين استرخاء سريع"):
-        progress_bar = st.progress(0)
-        for i in range(100):
-            time.sleep(0.05)
-            progress_bar.progress(i + 1)
-        st.write("شهيق... زفير... أحسنت!")
-
-# تذييل الصفحة
-st.markdown("---")
-st.caption("جميع البيانات مشفرة وتخضع للسرية المهنية التامة.")
+# إضافة نصيحة جانبية
+st.sidebar.title("إحصائيات الجلسة")
+st.sidebar.info("الذكاء الاصطناعي نشط الآن وجاهز للاستماع.")
