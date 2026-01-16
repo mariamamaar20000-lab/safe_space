@@ -2,68 +2,56 @@ import streamlit as st
 import time
 
 # إعدادات الصفحة
-st.set_page_config(page_title="Safe Space AI | Dr. Sharon", page_icon="🧠", layout="centered")
+st.set_page_config(page_title="Safe Space | Dr. Sharon", page_icon="🌿", layout="centered")
 
-# التصميم الكحلي الفخم (CSS)
+# التصميم الكحلي الفخم اللي طلبته
 st.markdown("""
     <style>
-    .stApp {
-        background-color: #1a2634; /* لون كحلي غامق */
-        color: white;
-    }
-    .stTextInput input, .stTextArea textarea {
-        background-color: #2c3e50 !important;
-        color: white !important;
-        border: 1px solid #3498db !important;
-    }
-    h1, h2, h3, p {
-        color: white !important;
-    }
-    .stButton>button {
-        background-color: #3498db;
-        color: white;
-        border-radius: 20px;
-        width: 100%;
-        border: none;
-    }
-    .bot-msg {
-        background-color: #2c3e50;
-        padding: 15px;
-        border-radius: 15px;
-        border-right: 5px solid #3498db;
-        margin-top: 10px;
-    }
+    .stApp { background-color: #0b1120; color: #e2e8f0; }
+    .main-title { font-size: 38px; color: #38bdf8; text-align: center; font-weight: bold; padding: 20px; }
+    .stTextArea textarea { background-color: #1e293b !important; color: white !important; border: 1px solid #38bdf8 !important; border-radius: 15px !important; }
+    .stButton>button { background: linear-gradient(90deg, #0ea5e9, #6366f1); color: white; border-radius: 12px; font-weight: bold; border: none; padding: 10px; width: 100%; }
+    .chat-bubble { background-color: #1e293b; padding: 25px; border-radius: 20px; border-right: 6px solid #38bdf8; margin-top: 20px; font-size: 19px; line-height: 1.7; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🧠 عيادة الذكاء الاصطناعي | د. شارون")
-st.write("مرحباً بك في مساحتك الخاصة. أنا هنا لأسمعك وأحلل مشكلاتك بكل سرية.")
+st.markdown('<div class="main-title">🌿 Safe Space | Dr. Sharon</div>', unsafe_allow_html=True)
+st.write("<p style='text-align: center; font-size: 18px;'>أنا دكتور شارون.. احكي لي أي حاجة حصلت معاك، أنا هنا عشان أسمعك وأفهمك بجد. ❤️</p>", unsafe_allow_html=True)
 
-# منطقة الدردشة
-user_problem = st.text_area("صف لي ما تشعر به أو المشكلة التي تواجهك:")
+# خانة إدخال المشكلة
+user_input = st.text_area("", placeholder="فضفض هنا.. مهما كان اللي حصل، أنا معاك..", height=150)
 
-if st.button("تحليل المشكلة والحصول على حل"):
-    if user_problem:
-        with st.spinner('جاري تحليل كلماتك بعمق...'):
-            time.sleep(2) # محاكاة تفكير الذكاء الاصطناعي
-            
-            st.subheader("💡 تحليل العيادة الذكية:")
-            
-            # منطق رد تفاعلي (Simulated AI Logic)
-            if "حزين" in user_problem or "ضيق" in user_problem:
-                response = "أشعر بحزنك يا صديقي. تذكر أن الغيوم لا تبقى للأبد، والتنفس بعمق الآن هو أول خطوة للهدوء. هل جربت كتابة ما يزعجك في ورقة وحرقها؟"
-            elif "قلق" in user_problem or "خايف" in user_problem:
-                response = "القلق هو مجرد إنذار خاطئ من العقل. أنت في أمان الآن. حاول تركيز نظرك على 3 أشياء زرقاء حولك الآن لتهدئة جهازك العصبي."
-            elif "تعبان" in user_problem or "مرهق" in user_problem:
-                response = "جسدك يطلب منك الهدنة. أنت لست في سباق مع أحد. خذ قسطاً من الراحة، فالعالم لن يتوقف إذا ارتحت قليلاً."
-            else:
-                response = "شكرًا لثقتك ومشاركتي هذه المشاعر. أنت شخص شجاع جداً لمجرد حديثك عن هذا. ابدأ بالتركيز على ما يمكنك التحكم فيه فقط اليوم."
-            
-            st.markdown(f'<div class="bot-msg">{response}</div>', unsafe_allow_html=True)
-            st.balloons()
+# محرك الردود الذكي والمجاني (بلهجة مصرية حكيمة)
+def get_pro_response(text):
+    text = text.strip().lower()
+    
+    # ردود ذكية شاملة لأي موقف (حادثة، فشل، ضيق، مشاكل أهل)
+    if any(word in text for word in ["حادث", "وجع", "مستشفى", "خبط"]):
+        return "ألف سلامة على قلبك! دي خضة كبيرة أوي ومقدر جداً إنك لسه تحت تأثير الصدمة. أهم حاجة إنك وسطنا دلوقتي وبخير. احكي لي، جسمك وجعك؟ ولا الخضة هي اللي مأثرة أكتر؟ أنا جنبك متقلقش. 🤕💙"
+    
+    if any(word in text for word in ["فشل", "سقط", "خسر", "رفض"]):
+        return "بص لي هنا.. الفشل ده مجرد 'محطة' مش نهاية الطريق. مفيش حد نجح إلا لما وقع مية مرة. أنت بطل إنك لسه بتحاول وبتحكي. قولي إيه اللي حاسس إنه عطلك؟ ونفكر سوا نصلحه إزاي المرة الجاية. ✨💪"
+    
+    if any(word in text for word in ["أهل", "بابا", "ماما", "البيت", "زهقت"]):
+        return "الأهل هما أصعب علاقة في الدنيا، حب كبير بس ساعات بيبقى فيه ضغط مبيتحملش. ما تزهقش منهم، هم ساعات مبيفهموش لغتنا. احكي لي طيب، إيه أكتر موقف النهاردة ضايقك معاهم؟ نطلع اللي جوانا عشان نرتاح. 🏠🫂"
+
+    if any(word in text for word in ["وحد", "لوحدي", "محدش", "حزين"]):
+        return "إحساس الوحدة ده غدار، بيحسسنا إننا في جزيرة مهجورة.. بس أنا معاك دلوقتي وسامعك. أنت شخص غالي وليك قيمة كبيرة حتى لو اللي حوليك مش شايفين ده دلوقتي. قولي، إيه اللي مخليك حاسس إنك لوحدك؟ 🌊🤝"
+
+    if len(text) > 10:
+        return "كلامك فيه تفاصيل كتير ومهمة جداً.. أنا حاسس بكل حرف كتبته. واضح إنك شايل كتير في قلبك والوقت جه إنك ترتاح. كمل حكايتك، أنا كدكتور شارون مركز معاك وعايز أساعدك نعدي الأزمة دي سوا. 😊🌿"
+    
+    return "أنا معاك وسامعك.. كمل فضفضة، قولي إيه اللي حصل بالظبط ومضايقك؟ أنا هنا عشانك. ❤️"
+
+if st.button("تحدث مع د. شارون (جلسة خاصة)"):
+    if user_input:
+        with st.spinner('دكتور شارون بيفكر في كلامك بعناية...'):
+            time.sleep(2)
+            response = get_pro_response(user_input)
+            st.markdown(f'<div class="chat-bubble"><b>د. شارون:</b><br>{response}</div>', unsafe_allow_html=True)
+            if "فشل" in user_input or "خسرت" in user_input:
+                st.snow()
     else:
-        st.warning("من فضلك اكتب شيئاً أولاً لأتمكن من مساعدتك.")
+        st.info("يا بطل، اكتب أي حاجة شاغلة بالك عشان أقدر أرد عليك! 😊")
 
-# إضافة نصيحة جانبية
-st.sidebar.title("إحصائيات الجلسة")
-st.sidebar.info("الذكاء الاصطناعي نشط الآن وجاهز للاستماع.")
+st.markdown("<br><hr><p style='text-align: center; opacity: 0.5;'>جلسة سرية تماماً - دكتور شارون المصري</p>", unsafe_allow_html=True)
