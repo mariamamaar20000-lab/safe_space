@@ -1,20 +1,23 @@
 import streamlit as st
 import time
-import random
+from textblob import TextBlob
+from openai import OpenAI
 
-# ================= UI & STYLE =================
-st.set_page_config(page_title="Safe Space | Dr. Sharon", page_icon="🧠", layout="centered")
+# ================= API =================
+client = OpenAI(api_key="PUT_YOUR_API_KEY_HERE")
+
+# ================= UI =================
+st.set_page_config("Safe Space | Dr. Sharon", "🧠", layout="centered")
 
 st.markdown("""
 <style>
-.stApp { background:#0b1120; color:white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-.title { font-size:40px; color:#38bdf8; text-align:center; font-weight:800; padding:20px; text-shadow: 2px 2px 4px #000; }
-.box { background:#1e293b; border:1px solid #334155; padding:20px; border-radius:18px; margin:15px 0; line-height:1.6; position: relative; }
-.user { border-right:6px solid #22c55e; background:#1e293b; }
-.bot { border-right:6px solid #38bdf8; background:#0f172a; }
-.alert { border-right:6px solid #ef4444; background:#2d0a0a; }
-.small { color:#94a3b8; font-size:13px; margin-top:10px; display:block; border-top: 1px dashed #334155; padding-top:5px; }
-.whatsapp-btn { background: #25d366; color: white !important; border-radius: 12px; padding: 10px; text-decoration: none; display: block; text-align: center; font-weight: bold; margin-top: 20px; }
+.stApp { background:#020617; color:white }
+.title { font-size:38px; color:#38bdf8; text-align:center; font-weight:800 }
+.box { background:#020617; border:1px solid #1e293b; padding:20px; border-radius:18px; margin:12px 0 }
+.user { border-right:6px solid #22c55e }
+.bot { border-right:6px solid #38bdf8 }
+.alert { border-right:6px solid #ef4444; background:#160000 }
+.small { color:#94a3b8; font-size:14px }
 </style>
 """, unsafe_allow_html=True)
 
@@ -23,87 +26,158 @@ st.markdown('<div class="title">🧠 Safe Space | Dr. Sharon</div>', unsafe_allo
 # ================= MEMORY =================
 if "chat" not in st.session_state:
     st.session_state.chat = []
+
 if "patterns" not in st.session_state:
     st.session_state.patterns = []
 
-# ================= SMART ENGINE (FREE VERSION) =================
+# ================= PSYCHO ENGINE =================
 def psycho_scan(text):
-    t = text.lower()
-    danger_words = ["انتحر", "اموت", "انهي حياتي", "أدبح", "أقتل نفسي", "سم", "حبوب"]
-    danger = any(w in t for w in danger_words)
-    
+    blob = TextBlob(text)
+    polarity = blob.sentiment.polarity
+    danger_words = ["انتحر", "اموت", "مش عايش", "عايز اختفي", "أأذي نفسي"]
+    danger = any(w in text.lower() for w in danger_words)
+
     if danger:
-        return "اكتئاب حاد / خطر", "HIGH 🚨"
-    if any(w in t for w in ["زهقت", "تعبت", "مخنوق", "اهلي", "البيت"]):
-        return "ضغط نفسي / اجتماعي", "MEDIUM ⚠️"
-    return "تفريغ مشاعر", "LOW 🟢"
+        risk = "HIGH 🚨"
+    elif polarity < -0.5:
+        risk = "MEDIUM ⚠️"
+    else:
+        risk = "LOW 🟢"
 
-def get_dr_sharon_response(text, state, risk):
+    if polarity < -0.6:
+        state = "اكتئاب / ضغط نفسي عالي"
+    elif polarity < -0.2:
+        state = "قلق أو توتر"
+    elif polarity > 0.4:
+        state = "مزاج إيجابي"
+    else:
+        state = "مزاج متقلب"
+
+    return state, risk
+
+# ================= SMART QUESTION =================
+def smart_question(state):
+    if "قلق" in state:
+        return "الإحساس ده بيجيلك فجأة ولا بعد تفكير طويل؟"
+    if "اكتئاب" in state:
+        return "حاسس بكده من إمتى؟ ولا الموضوع له سبب قريب؟"
+    return "خلّينا نركز… إيه أكتر نقطة شاغلاك دلوقتي؟"
+
+# ================= DEEP PSYCHO PROFILE =================
+def deep_psycho_profile(text):
     t = text.lower()
-    
-    # ردود ذكية جداً ومحللة للموقف (بالمصري)
-    if risk == "HIGH 🚨":
-        return "اسمعني يا بطل.. أنا حاسس بالوجع اللي أنت فيه، بس روحك دي أمانة وما ينفعش نفرط فيها مهما حصل. ربنا بيقول 'ولا تقتلوا أنفسكم إن الله كان بكم رحيماً'. استهدي بالله كدة وكلمني واتساب حالاً نلاقي مخرج سوا. الموت مش حل، ده هروب من فرصة إنك تبقى أحسن."
+    score = 50
+    traits = []
 
-    if "اهل" in t or "بيت" in t or "بابا" in t or "ماما" in t:
-        return "الأهل هما أكتر ناس بنحبهم وعشان كدة هما أكتر ناس بيقدروا يوجعونا. ما تسبش البيت ولا تاخد قرار وأنت متعصب. قولي بالظبط، إيه اللي حصل النهاردة وصلك للدرجة دي؟ أنا سامعك وبفهمك."
+    if any(x in t for x in ["دايما", "عمري", "مفيش فايده"]):
+        traits.append("تفكير أبيض/أسود")
+        score -= 10
+    if any(x in t for x in ["لو", "يمكن", "مش عارف"]):
+        traits.append("تردد وقلق")
+        score -= 5
+    if any(x in t for x in ["زهقت", "تعبت", "مش قادر"]):
+        traits.append("إرهاق نفسي")
+        score -= 15
+    if any(x in t for x in ["هحاول", "لازم", "هقوم"]):
+        traits.append("إرادة مقاومة")
+        score += 10
 
-    if "فشلت" in t or "خسرت" in t or "سقطت" in t:
-        return "الوقوع مش نهاية العالم، ده مجرد درس قاسي. أنت لسه جواك طاقة وقوة بدليل إنك جيت واتكلمت. إيه اللي أنت شايفه دلوقتي ممكن نعمله عشان نقوم تاني؟"
+    score = max(0, min(100, score))
+    return traits, score
 
-    if len(text) < 10:
-        return "خُد وقتك.. أنا مش مستعجل. كمل كلامك وأنا معاك وبسمعك بقلبي قبل عقلي."
+# ================= THERAPY EXERCISE =================
+def therapy_exercise(state):
+    if "اكتئاب" in state:
+        return "خلينا ناخد نفس سوا: خد شهيق 4 ثواني… ثبّت 4… زفير 6. كرر 3 مرات."
+    elif "قلق" in state:
+        return "بص حواليك وسمّي 5 حاجات شايفها، 3 أصوات سامعها، حاجة واحدة لامسها."
+    else:
+        return "أنت ثابت دلوقتي، حاول تكتب إحساسك في جملة واحدة من غير تفكير."
 
-    # رد عام ذكي
-    responses = [
-        "كلامك فيه تفاصيل توجع، بس أنت شجاع إنك حكيت. كمل أنا بربط الخيوط ببعضها عشان نفهم المشكلة من جدرها.",
-        "واضح إنك شايل كتير فوق طاقتك. قولي، إيه أكتر حاجة في اللي حكيته ده هي اللي مأثرة على نومك وتفكيرك دلوقتي؟",
-        "أنا معاك.. الفضفضة دي أول خطوة في العلاج. احكي لي أكتر عن إحساسك في اللحظة دي."
-    ]
-    return random.choice(responses)
+# ================= REMEMBER PATTERN =================
+def remember_pattern(traits):
+    for t in traits:
+        if t not in st.session_state.patterns:
+            st.session_state.patterns.append(t)
+
+# ================= SILENCE LOGIC =================
+def should_be_silent(text):
+    return len(text.split()) < 4 or text.endswith("...")
+
+# ================= AI BRAIN =================
+def dr_sharon_ai(user_text, state, risk):
+    traits, score = deep_psycho_profile(user_text)
+    remember_pattern(traits)
+    exercise = therapy_exercise(state)
+
+    memory_note = ""
+    if st.session_state.patterns:
+        memory_note = f"خد بالك… ده مش أول مرة يطلع عندك {st.session_state.patterns[-1]}."
+
+    if should_be_silent(user_text):
+        return "أنا ساكت قصد… خُد وقتك. أنا موجود.", traits, score, exercise, memory_note
+
+    system_prompt = f"""
+أنت Dr. Sharon
+دكتور نفسي رجل
+بتتكلم مصري طبيعي جدًا
+كلامك بسيط، واقعي، مش فيك
+بتسأل بس لما السؤال مهم
+أحيانًا تسكت لو السكوت أحسن
+بتفتكر الأنماط مش الكلام
+ما بتحكمش
+ما تديش حلول جاهزة
+خليك بني آدم قبل ما تكون دكتور
+الحالة النفسية: {state}
+مستوى الخطر: {risk}
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_text}
+        ],
+        temperature=0.9
+    )
+
+    return response.choices[0].message.content, traits, score, exercise, memory_note
 
 # ================= CHAT VIEW =================
-chat_placeholder = st.container()
-with chat_placeholder:
-    for m in st.session_state.chat:
-        css = "alert" if m.get("alert") else ("user" if m["role"]=="user" else "bot")
-        name = "أنت" if m["role"]=="user" else "د. شارون"
-        st.markdown(
-            f'<div class="box {css}"><b>{name}:</b> {m["text"]}<br><span class="small">{m.get("meta","")}</span></div>',
-            unsafe_allow_html=True
-        )
+for m in st.session_state.chat:
+    css = "alert" if m.get("alert") else ("user" if m["role"]=="user" else "bot")
+    name = "أنت" if m["role"]=="user" else "د. شارون"
+    st.markdown(
+        f'<div class="box {css}"><b>{name}:</b> {m["text"]}<br><span class="small">{m.get("meta","")}</span></div>',
+        unsafe_allow_html=True
+    )
 
 # ================= INPUT =================
-with st.form("chat_input", clear_on_submit=True):
-    user_text = st.text_input("فضفض.. دكتور شارون معاك وفي سرية تامة")
-    submitted = st.form_submit_button("إرسال")
+with st.form("input", clear_on_submit=True):
+    text = st.text_input("اتكلم… كل اللي جواك آمن هنا")
+    send = st.form_submit_button("إرسال")
 
-if submitted and user_text:
-    state, risk = psycho_scan(user_text)
-    reply = get_dr_sharon_response(user_text, state, risk)
-    
-    # إضافة لليوزر
+if send and text:
+    state, risk = psycho_scan(text)
+    reply, traits, score, exercise, memory_note = dr_sharon_ai(text, state, risk)
+
     st.session_state.chat.append({
-        "role": "user",
-        "text": user_text,
-        "meta": f"🧠 الحالة: {state} | ⚠️ الخطر: {risk}"
+        "role":"user",
+        "text":text,
+        "meta":f"🧠 الحالة: {state} | ⚠️ الخطر: {risk}"
     })
-    
-    # إضافة للدكتور
+
     st.session_state.chat.append({
-        "role": "bot",
-        "text": reply,
-        "meta": f"📊 دكتور شارون بيحلل حالتك الآن...",
-        "alert": True if risk == "HIGH 🚨" else False
+        "role":"bot",
+        "text":reply,
+        "meta":f"📊 تحليل: {state} | 🧬 سمات: {', '.join(traits)} | 📈 المؤشر: {score}/100 | 🧘 تمرين: {exercise}\n{memory_note}",
+        "alert": True if "HIGH" in risk else False
     })
+
     st.rerun()
 
-# ================= TOOLS =================
-st.markdown("---")
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("🗑️ جلسة جديدة"):
-        st.session_state.chat = []
-        st.rerun()
-with col2:
-    st.markdown('<a href="https://wa.me/201009469831" class="whatsapp-btn">📞 واتساب د. شارون</a>', unsafe_allow_html=True)
+# ================= RESET =================
+if st.button("🗑️ جلسة جديدة"):
+    st.session_state.chat = []
+    st.session_state.patterns = []
+    st.rerun()
